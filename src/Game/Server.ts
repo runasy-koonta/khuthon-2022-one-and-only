@@ -12,6 +12,10 @@ interface NewPlayerData {
   x: number;
   y: number;
 }
+interface PlayerVoice {
+  playerId: string;
+  voice: string;
+}
 
 class Server {
   private _socket;
@@ -31,6 +35,11 @@ class Server {
     this._socket.on('playerDisconnect', (playerId: string) => {
       this._onPlayerDisconnect(playerId);
     });
+    this._socket.on('voice', (data: PlayerVoice) => {
+      this._onPlayerVoice(data);
+    });
+
+    this._startVoiceChat(300);
   }
 
   public sendPlayerMoveData(x: number, y: number) {
@@ -38,6 +47,62 @@ class Server {
       x,
       y,
     });
+  }
+
+  private _startVoiceChat(chunkDuration: number) {
+    const s = this._socket;
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.start();
+
+      let audioChunks: Blob[] = [];
+
+      mediaRecorder.addEventListener("dataavailable", function (event) {
+        audioChunks.push(event.data);
+      });
+
+      mediaRecorder.addEventListener("stop", function () {
+        const audioBlob = new Blob(audioChunks);
+
+        audioChunks = [];
+
+        const fileReader = new FileReader();
+        fileReader.readAsDataURL(audioBlob);
+        fileReader.onloadend = function () {
+          const base64String = fileReader.result;
+          s.emit("voice", base64String);
+        };
+
+        mediaRecorder.start();
+
+        setTimeout(function () {
+          mediaRecorder.stop();
+        }, chunkDuration);
+      });
+
+      setTimeout(function () {
+        mediaRecorder.stop();
+      }, chunkDuration);
+    });
+  }
+
+  private _onPlayerVoice(data: PlayerVoice) {
+    if (data.playerId === this._socket.id) {
+      return;
+    }
+
+    const playerLocation = this._game.state.players.find(player => player.playerId === data.playerId);
+    if (!playerLocation) {
+      return;
+    }
+    const me = this._game.state.players[0];
+
+    const distance = Math.sqrt(Math.pow(playerLocation.playerSprite.x - me.playerSprite.x, 2) + Math.pow(playerLocation.playerSprite.y - me.playerSprite.y, 2));
+
+    if (distance < 200) {
+      const audio = new Audio(data.voice);
+      audio.play().then();
+    }
   }
 
   private _onNewPlayer(data: NewPlayerData) {
@@ -62,12 +127,12 @@ class Server {
     newPlayer.playerId = data.playerId;
     this._game.state.players.push(newPlayer);
   }
+
   private _onPlayerDisconnect(playerId: string) {
     const playerIndex = this._game.state.players.findIndex(player => player.playerId === playerId);
     this._game.state.players.splice(playerIndex, 1);
     console.log(playerId, playerIndex, this._game.state.players);
   }
-
 
   private _onPlayerMove(data: PlayerMoveData) {
     if (data.playerId === this._socket.id) {
