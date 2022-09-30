@@ -51,6 +51,7 @@ class Game extends Component<any, GameState> {
 
   public server: Server | undefined;
   private gameCanvas: HTMLCanvasElement | null = null;
+  public gameWrapper: HTMLDivElement | null = null;
 
   private cachedBackgroundSprite?: HTMLImageElement;
 
@@ -167,7 +168,7 @@ class Game extends Component<any, GameState> {
   render() {
     return (
       <div ref={(ref) => {
-
+        this.gameWrapper = ref;
       }}>
         <canvas ref={(ref) => {
           this.gameCanvas = ref;

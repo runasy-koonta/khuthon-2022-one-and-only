@@ -18,6 +18,10 @@ class Server {
   constructor(private _game: Game) {
     this._socket = io('localhost:3001');
 
+    this._socket.on('connect', () => {
+      this._game.state.players[0].playerId = this._socket.id;
+    });
+
     this._socket.on('playerMove', (data: PlayerMoveData) => {
       this._onPlayerMove(data);
     });

@@ -4,7 +4,7 @@ import Game from "./";
 type PlayerStatus = "idle" | "walking";
 
 class Player {
-  public playerId?: string;
+  private _playerId: string = '';
   public playerStatus: PlayerStatus = 'idle';
   public location: {
     x: number;
@@ -12,6 +12,7 @@ class Player {
   };
   public isMe: boolean = false;
 
+  private _nameTag: HTMLDivElement = document.createElement('div');
   private _animationStatus: number = 0;
 
   constructor(public playerSprite: Sprite, private game: Game) {
@@ -23,7 +24,25 @@ class Player {
     setInterval(() => this.animationPlayer(), 350 / 32);
   }
 
+  set playerId(playerId: string) {
+    this._playerId = playerId;
+
+    this._nameTag.classList.add('name-tag');
+    this.game.gameWrapper?.appendChild(this._nameTag);
+    this._nameTag.innerText = playerId;
+    this._refreshNameTag();
+  }
+  get playerId() {
+    return this._playerId;
+  }
+
+  private _refreshNameTag() {
+    this._nameTag.style.left = `${(this.playerSprite.x - (16 * 1.5)) * 1.5}px`;
+    this._nameTag.style.top = `${(this.playerSprite.y - 18) * 1.5}px`;
+  }
+
   public animationPlayer() {
+    this._refreshNameTag();
     if (this.playerStatus === 'walking') {
       this._animationStatus += 1;
       this._animationStatus %= 40;
