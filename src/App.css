@@ -1,0 +1,38 @@
+@import url('//fonts.googleapis.com/css2?family=Alkalami&family=Roboto:wght@300&display=swap');
+
+.LoginPage {
+    background-color: #00a0e9;
+    width: 100%;
+    min-height: 100vh;
+    text-align: center;
+}
+
+.LoginPage .LogoArea {
+    display: inline-block;
+    color: white;
+    font-size: 50px;
+    margin-top: 180px;
+    font-family: 'Alkalami', serif;
+}
+.LoginPage .input {
+    width: 300px;
+    height: 40px;
+    border-radius: 20px;
+    background-color: #0085bd;
+    font-size: 17px;
+    text-align: center;
+    color: white;
+    border: none;
+}
+.LoginPage .button {
+    cursor: pointer;
+    font-family: 'Roboto', sans-serif;
+    width: 100px;
+    height: 40px;
+    border-radius: 20px;
+    border: none;
+    background-color: #0085bd;
+    font-size: 17px;
+    color: white;
+    margin-top: 10px;
+}
