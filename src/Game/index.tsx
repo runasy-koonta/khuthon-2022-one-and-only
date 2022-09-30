@@ -6,6 +6,7 @@ import {BackgroundSprite, ImageSet, Sprite} from "../types/Game";
 import DemoMap from '../map.json';
 import Player from "./Player";
 import Server from "./Server";
+import {createInterface} from "readline";
 
 interface GameState {
   sprites: Sprite[];
@@ -17,7 +18,8 @@ class Game extends Component<any, GameState> {
   state: GameState = {
     sprites: [
       {
-        x: 32,
+        name: '표지판',
+        x: 128,
         y: 32,
         width: 32,
         height: 32,
@@ -29,6 +31,7 @@ class Game extends Component<any, GameState> {
           height: 32,
         },
         isPassable: false,
+        isInteractable: true,
       }
     ],
     background: DemoMap,
@@ -135,8 +138,38 @@ class Game extends Component<any, GameState> {
       return;
     }
 
-    for (const sprite of this.state.sprites) {
+    for (const spriteIndex in this.state.sprites) {
+      const sprite = this.state.sprites[spriteIndex];
+      context.save();
+
+      const me = this.state.players[0].playerSprite;
+      const target = sprite;
+      const distance = Math.sqrt(Math.pow(me.x - target.x, 2) + Math.pow(me.y - target.y, 2));
+
+      if (distance < 100 && sprite.isInteractable === true) {
+        context.shadowBlur = 5;
+        context.shadowColor = "yellow";
+
+        let interactHelper: HTMLDivElement | null | undefined = this.gameWrapper?.querySelector('#interact-helper-' + spriteIndex);
+        if (interactHelper === null) {
+          interactHelper = document.createElement('div');
+          interactHelper.classList.add('interact-helper');
+          interactHelper.innerHTML = `${sprite.name}을 보려면 X키를 누르세요.`;
+          interactHelper.id = 'interact-helper-' + spriteIndex;
+          interactHelper.style.left = (sprite.x * 1.5) + 'px';
+          interactHelper.style.top = ((sprite.y + 35) * 1.5) + 'px'
+          this.gameWrapper?.appendChild(interactHelper);
+        }
+        interactHelper!.style.marginLeft = `${-((interactHelper!.offsetWidth - (32 * 1.5)) / 2)}px`;
+      } else {
+        const interactHelper = this.gameWrapper?.querySelector('#interact-helper-' + spriteIndex);
+        if (interactHelper) {
+          interactHelper.remove();
+        }
+      }
+
       await this._drawImage(sprite.x, sprite.y, sprite.width, sprite.height, sprite.image);
+      context.restore();
     }
   }
 

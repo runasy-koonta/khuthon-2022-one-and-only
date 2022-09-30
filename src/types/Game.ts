@@ -19,6 +19,7 @@ export interface Sprite {
   image: string | ImageSet;
 
   isPassable?: boolean;
+  isInteractable?: boolean;
 }
 
 export interface BackgroundSprite extends Sprite {

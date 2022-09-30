@@ -17,7 +17,21 @@ canvas {
     font-size: 9px;
     top: 0;
     left: 0;
-    background-color: darkslateblue;
+    background-color: rgba(72, 61, 139, 0.5);
+    color: white;
+}
+
+.interact-helper {
+    position: absolute;
+    padding: 0 10px;
+    line-height: 24px;
+    height: 24px;
+    border: 1px solid white;
+    border-radius: 15px;
+    font-size: 13px;
+    top: 0;
+    left: 0;
+    background-color: rgba(72, 61, 139, 0.8);
     color: white;
 
 }
