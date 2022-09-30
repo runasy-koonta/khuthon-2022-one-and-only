@@ -20,21 +20,137 @@ class Game extends Component<GameProps, GameState> {
   state: GameState = {
     sprites: [
       {
-        name: '첨부된 유튜브 영상',
-        x: 128,
-        y: 32,
+        name: '',
+        x: 64,
+        y: 64,
         width: 32,
         height: 32,
         image: {
-          image: "/assets/sprite/default_tileset.png",
-          x: 64,
-          y: 0,
+          image: "/assets/sprite/interior.png",
+          x: 384,
+          y: 1440,
           width: 32,
           height: 32,
         },
         isPassable: false,
+        isInteractable: false,
+      },
+      {
+        name: '',
+        x: 64,
+        y: 96,
+        width: 32,
+        height: 32,
+        image: {
+          image: "/assets/sprite/interior.png",
+          x: 384,
+          y: 1472,
+          width: 32,
+          height: 32,
+        },
+        isPassable: false,
+        isInteractable: false,
+      },
+      {
+        name: '교내 게시판',
+        x: 128,
+        y: 32,
+        width: 64,
+        height: 64,
+        image: {
+          image: "/assets/sprite/interior.png",
+          x: 416,
+          y: 1280,
+          width: 64,
+          height: 64,
+        },
+        isPassable: false,
         isInteractable: true,
-      }
+        url: '',
+      },
+      {
+        name: '',
+        x: 384,
+        y: 64,
+        width: 32,
+        height: 32,
+        image: {
+          image: "/assets/sprite/interior.png",
+          x: 384,
+          y: 1440,
+          width: 32,
+          height: 32,
+        },
+        isPassable: false,
+        isInteractable: false,
+      },
+      {
+        name: '',
+        x: 384,
+        y: 96,
+        width: 32,
+        height: 32,
+        image: {
+          image: "/assets/sprite/interior.png",
+          x: 384,
+          y: 1472,
+          width: 32,
+          height: 32,
+        },
+        isPassable: false,
+        isInteractable: false,
+      },
+      {
+        name: '교내 게시판',
+        x: 448,
+        y: 32,
+        width: 64,
+        height: 64,
+        image: {
+          image: "/assets/sprite/interior.png",
+          x: 416,
+          y: 1280,
+          width: 64,
+          height: 64,
+        },
+        isPassable: false,
+        isInteractable: true,
+        url: '',
+      },
+      {
+        name: '경희대학교',
+        x: 96,
+        y: 210,
+        width: 32,
+        height: 32,
+        image: {
+          image: "/assets/sprite/interior.png",
+          x: 288,
+          y: 864,
+          width: 32,
+          height: 32,
+        },
+        isPassable: false,
+        isInteractable: false,
+        showText: true,
+      },
+      {
+        name: '경기대학교',
+        x: 416,
+        y: 210,
+        width: 32,
+        height: 32,
+        image: {
+          image: "/assets/sprite/interior.png",
+          x: 288,
+          y: 864,
+          width: 32,
+          height: 32,
+        },
+        isPassable: false,
+        isInteractable: false,
+        showText: true,
+      },
     ],
     background: DemoMap,
     players: [
@@ -144,8 +260,8 @@ class Game extends Component<GameProps, GameState> {
 
     const leftMarginDiff = leftMargin - center;
     const topMarginDiff = topMargin - topCenter;
-    this.screenLeft = Math.floor(Math.min(Math.max(0, this.screenLeft + leftMarginDiff), this.gameWidth - (window.innerWidth / 1.5)));
-    this.screenTop = Math.floor(Math.min(Math.max(0, this.screenTop + topMarginDiff), this.gameHeight - (window.innerHeight / 1.5)));
+    this.screenLeft = (Math.min(Math.max(0, this.screenLeft + leftMarginDiff), this.gameWidth - (window.innerWidth / 1.5)));
+    this.screenTop = (Math.min(Math.max(0, this.screenTop + topMarginDiff), this.gameHeight - (window.innerHeight / 1.5)));
 
     for (const player of this.state.players) {
       await this._drawImage(player.playerSprite.x - this.screenLeft, player.playerSprite.y - this.screenTop, player.playerSprite.width, player.playerSprite.height, player.playerSprite.image);
@@ -167,7 +283,7 @@ class Game extends Component<GameProps, GameState> {
       const target = sprite;
       const distance = Math.sqrt(Math.pow(me.x - target.x, 2) + Math.pow(me.y - target.y, 2));
 
-      if (distance < 100 && sprite.isInteractable === true) {
+      if (distance < 80 && (sprite.isInteractable === true || sprite.showText === true)) {
         context.shadowBlur = 5;
         context.shadowColor = "yellow";
 
@@ -175,12 +291,12 @@ class Game extends Component<GameProps, GameState> {
         if (interactHelper === null) {
           interactHelper = document.createElement('div');
           interactHelper.classList.add('interact-helper');
-          interactHelper.innerHTML = `${sprite.name}을 보려면 X키를 누르세요.`;
+          interactHelper.innerHTML = sprite.isInteractable ? `${sprite.name}을 보려면 X키를 누르세요.` : sprite.name!;
           interactHelper.id = 'interact-helper-' + spriteIndex;
-          interactHelper.style.left = ((sprite.x - this.screenLeft) * 1.5) + 'px';
-          interactHelper.style.top = ((sprite.y + 35 - this.screenTop) * 1.5) + 'px'
           this.gameWrapper?.appendChild(interactHelper);
         }
+        interactHelper!.style.left = ((sprite.x - this.screenLeft) * 1.5) + 'px';
+        interactHelper!.style.top = ((sprite.y + 35 - this.screenTop) * 1.5) + 'px'
         interactHelper!.style.marginLeft = `${-((interactHelper!.offsetWidth - (32 * 1.5)) / 2)}px`;
       } else {
         const interactHelper = this.gameWrapper?.querySelector('#interact-helper-' + spriteIndex);
@@ -223,7 +339,7 @@ class Game extends Component<GameProps, GameState> {
           websiteWrapper.classList.add('interact-website');
           const frame = document.createElement('iframe');
           websiteWrapper.appendChild(frame);
-          frame.src = 'https://www.youtube.com/embed/j-cObepig6Q?autoplay=1';
+          frame.src = interactTarget.url!;
 
           this.gameWrapper?.appendChild(websiteWrapper);
         }

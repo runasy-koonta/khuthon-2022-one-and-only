@@ -21,7 +21,7 @@ interface PlayerVoice {
 class Server {
   private _socket;
   constructor(nickname: string, private _game: Game) {
-    this._socket = io('localhost:3001');
+    this._socket = io('141.164.42.243:3001');
 
     this._socket.on('connect', () => {
       this._game.state.players[0].playerId = this._socket.id;

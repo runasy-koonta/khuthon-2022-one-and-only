@@ -20,6 +20,8 @@ export interface Sprite {
 
   isPassable?: boolean;
   isInteractable?: boolean;
+  url?: string;
+  showText?: boolean;
 }
 
 export interface BackgroundSprite extends Sprite {
