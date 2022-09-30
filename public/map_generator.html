@@ -1,0 +1,381 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Map Generator</title>
+    <style>
+        #selector {
+            position: absolute;
+            width: 640px;
+            height: 288px;
+        }
+        #selector div, #map div {
+            display: inline-block;
+            cursor: pointer;
+            box-sizing: border-box;
+            height: 32px;
+            width: 32px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <textarea id="generated_json"></textarea>
+    <div id="assets">
+        <div id="selector"></div>
+        <img src="./assets/sprite/default_tileset.png" />
+    </div>
+    <hr />
+    <div id="map">
+
+    </div>
+    <script>
+      const cannotPass = [
+        {
+          "x": 1,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 2
+        },
+        {
+          "x": 0,
+          "y": 4
+        },
+        {
+          "x": 1,
+          "y": 2
+        },
+        {
+          "x": 1,
+          "y": 1
+        },
+        {
+          "x": 0,
+          "y": 15
+        },
+        {
+          "x": 0,
+          "y": 16
+        },
+        {
+          "x": 0,
+          "y": 17
+        },
+        {
+          "x": 1,
+          "y": 17
+        },
+        {
+          "x": 1,
+          "y": 16
+        },
+        {
+          "x": 1,
+          "y": 15
+        },
+        {
+          "x": 2,
+          "y": 15
+        },
+        {
+          "x": 2,
+          "y": 16
+        },
+        {
+          "x": 2,
+          "y": 17
+        },
+        {
+          "x": 2,
+          "y": 18
+        },
+        {
+          "x": 2,
+          "y": 19
+        },
+        {
+          "x": 1,
+          "y": 19
+        },
+        {
+          "x": 1,
+          "y": 18
+        },
+        {
+          "x": 0,
+          "y": 18
+        },
+        {
+          "x": 0,
+          "y": 19
+        },
+        {
+          "x": 1,
+          "y": 18
+        },
+        {
+          "x": 2,
+          "y": 1
+        },
+        {
+          "x": 3,
+          "y": 5
+        },
+        {
+          "x": 4,
+          "y": 5
+        },
+        {
+          "x": 5,
+          "y": 5
+        },
+        {
+          "x": 5,
+          "y": 6
+        },
+        {
+          "x": 5,
+          "y": 7
+        },
+        {
+          "x": 5,
+          "y": 7
+        },
+        {
+          "x": 4,
+          "y": 7
+        },
+        {
+          "x": 3,
+          "y": 7
+        },
+        {
+          "x": 3,
+          "y": 7
+        },
+        {
+          "x": 3,
+          "y": 6
+        },
+        {
+          "x": 3,
+          "y": 8
+        },
+        {
+          "x": 4,
+          "y": 8
+        },
+        {
+          "x": 4,
+          "y": 8
+        },
+        {
+          "x": 4,
+          "y": 9
+        },
+        {
+          "x": 3,
+          "y": 9
+        },
+        {
+          "x": 5,
+          "y": 8
+        },
+        {
+          "x": 5,
+          "y": 9
+        },
+        {
+          "x": 5,
+          "y": 10
+        },
+        {
+          "x": 4,
+          "y": 10
+        },
+        {
+          "x": 3,
+          "y": 10
+        },
+        {
+          "x": 3,
+          "y": 11
+        },
+        {
+          "x": 3,
+          "y": 12
+        },
+        {
+          "x": 4,
+          "y": 12
+        },
+        {
+          "x": 5,
+          "y": 12
+        },
+        {
+          "x": 5,
+          "y": 11
+        },
+        {
+          "x": 3,
+          "y": 13
+        },
+        {
+          "x": 3,
+          "y": 14
+        },
+        {
+          "x": 4,
+          "y": 14
+        },
+        {
+          "x": 4,
+          "y": 13
+        },
+        {
+          "x": 5,
+          "y": 13
+        },
+        {
+          "x": 5,
+          "y": 14
+        },
+        {
+          "x": 6,
+          "y": 10
+        },
+        {
+          "x": 7,
+          "y": 10
+        },
+        {
+          "x": 8,
+          "y": 10
+        },
+        {
+          "x": 8,
+          "y": 11
+        },
+        {
+          "x": 7,
+          "y": 11
+        },
+        {
+          "x": 6,
+          "y": 11
+        },
+        {
+          "x": 6,
+          "y": 12
+        },
+        {
+          "x": 7,
+          "y": 12
+        },
+        {
+          "x": 8,
+          "y": 12
+        },
+        {
+          "x": 8,
+          "y": 13
+        },
+        {
+          "x": 8,
+          "y": 14
+        },
+        {
+          "x": 7,
+          "y": 14
+        },
+        {
+          "x": 7,
+          "y": 13
+        },
+        {
+          "x": 6,
+          "y": 13
+        },
+        {
+          "x": 6,
+          "y": 14
+        }
+      ];
+
+        for (let i = 0; i < 9; i++) {
+          for (let j = 0; j < 20; j++) {
+            if (cannotPass.find(p => p.x === i && p.y === j) !== undefined) {
+              document.querySelector('#selector').innerHTML += `<div style="border-color: red;" onclick="select_map(${i}, ${j})"></div>`;
+            } else {
+              document.querySelector('#selector').innerHTML += `<div onclick="select_map(${i}, ${j})"></div>`;
+            }
+          }
+        }
+
+        const tiles = [];
+        for (let i = 0; i < 20; i++) {
+          const p = [];
+          for (let j = 0; j < 40; j++) {
+            p.push(null);
+            document.querySelector('#map').innerHTML += `<div onclick="select_tile(this, ${i}, ${j})"></div>`;
+          }
+          document.querySelector('#map').innerHTML += `<br />`;
+            tiles.push(p);
+        }
+
+        let selectedTile = undefined;
+        function select_map(x, y) {
+          selectedTile = {
+            x,
+            y,
+          };
+        }
+        function select_tile(element, x, y) {
+          element.style.background = `url(assets/sprite/default_tileset.png)`;
+          element.style.backgroundPosition = `-${selectedTile.y * 32}px -${selectedTile.x * 32}px`;
+
+          tiles[x][y] = {
+            x: y * 32,
+            y: x * 32,
+            width: 32,
+            height: 32,
+            image: {
+              image: '/assets/sprite/default_tileset.png',
+              x: selectedTile.y * 32,
+              y: selectedTile.x * 32,
+              width: 32,
+              height: 32,
+            },
+          };
+          if (cannotPass.find(p => p.x === selectedTile.x && p.y === selectedTile.y) !== undefined) {
+            element.style.borderColor = 'red';
+            tiles[x][y]['isPassable'] = false;
+          } else {
+            element.style.borderColor = 'black';
+            tiles[x][y]['isPassable'] = true;
+          }
+
+          generate();
+        }
+
+        function generate() {
+          //generated_json
+          const q = [];
+          for (const row of tiles) {
+            for (const col of row) {
+              if (col !== null) {
+                q.push(col);
+              }
+            }
+          }
+
+          document.querySelector('#generated_json').value = JSON.stringify(q);
+        }
+    </script>
+</body>
+</html>
