@@ -37,8 +37,9 @@ class Player {
   }
 
   private _refreshNameTag() {
-    this._nameTag.style.left = `${(this.playerSprite.x - (16 * 1.5)) * 1.5}px`;
+    this._nameTag.style.left = `${this.playerSprite.x * 1.5}px`;
     this._nameTag.style.top = `${(this.playerSprite.y - 18) * 1.5}px`;
+    this._nameTag.style.marginLeft = `${-(this._nameTag.offsetWidth / 2) + (16 * 1.5)}px`;
   }
 
   public animationPlayer() {
