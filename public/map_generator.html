@@ -322,7 +322,7 @@
           const p = [];
           for (let j = 0; j < 40; j++) {
             p.push(null);
-            document.querySelector('#map').innerHTML += `<div onclick="select_tile(this, ${i}, ${j})"></div>`;
+            document.querySelector('#map').innerHTML += `<div onmousedown="startClick()" onmouseup="stopClick()" onmousemove="select_tile(this, ${i}, ${j})"></div>`;
           }
           document.querySelector('#map').innerHTML += `<br />`;
             tiles.push(p);
@@ -335,7 +335,15 @@
             y,
           };
         }
+        let clickStatus = false;
+        function startClick() {
+          clickStatus = true;
+        }
+        function stopClick() {
+          clickStatus = false;
+        }
         function select_tile(element, x, y) {
+          if (!clickStatus) return;
           element.style.background = `url(assets/sprite/default_tileset.png)`;
           element.style.backgroundPosition = `-${selectedTile.y * 32}px -${selectedTile.x * 32}px`;
 

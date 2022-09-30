@@ -6,7 +6,6 @@ import {BackgroundSprite, ImageSet, Sprite} from "../types/Game";
 import DemoMap from '../map.json';
 import Player from "./Player";
 import Server from "./Server";
-import {createInterface} from "readline";
 
 interface GameState {
   sprites: Sprite[];
@@ -18,7 +17,7 @@ class Game extends Component<any, GameState> {
   state: GameState = {
     sprites: [
       {
-        name: '표지판',
+        name: '첨부된 유튜브 영상',
         x: 128,
         y: 32,
         width: 32,
@@ -57,6 +56,11 @@ class Game extends Component<any, GameState> {
   public gameWrapper: HTMLDivElement | null = null;
 
   private cachedBackgroundSprite?: HTMLImageElement;
+
+  private gameWidth: number = 0;
+  private gameHeight: number = 0;
+  public screenLeft: number = 0;
+  public screenTop: number = 0;
 
   private _loadImage(image: string | ImageSet): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
@@ -115,7 +119,10 @@ class Game extends Component<any, GameState> {
     }
 
     for (const backgroundSprite of this.state.background) {
-      await this._drawImage(backgroundSprite.x, backgroundSprite.y, backgroundSprite.width, backgroundSprite.height, backgroundSprite.image);
+      await this._drawImage(backgroundSprite.x - this.screenLeft, backgroundSprite.y - this.screenTop, backgroundSprite.width, backgroundSprite.height, backgroundSprite.image);
+
+      this.gameWidth = Math.max(this.gameWidth, backgroundSprite.x + backgroundSprite.width);
+      this.gameHeight = Math.max(this.gameHeight, backgroundSprite.y + backgroundSprite.height);
     }
   }
 
@@ -126,8 +133,19 @@ class Game extends Component<any, GameState> {
       return;
     }
 
+    const me = this.state.players[0].playerSprite;
+    const leftMargin = (me.x - this.screenLeft + ((me.width * 1.5) / 2)) * 1.5;
+    const topMargin = (me.y - this.screenTop + ((me.height * 1.5) / 2)) * 1.5;
+    const center = window.innerWidth / 2;
+    const topCenter = window.innerHeight / 2;
+
+    const leftMarginDiff = leftMargin - center;
+    const topMarginDiff = topMargin - topCenter;
+    this.screenLeft = Math.floor(Math.min(Math.max(0, this.screenLeft + leftMarginDiff), this.gameWidth - (window.innerWidth / 1.5)));
+    this.screenTop = Math.floor(Math.min(Math.max(0, this.screenTop + topMarginDiff), this.gameHeight - (window.innerHeight / 1.5)));
+
     for (const player of this.state.players) {
-      await this._drawImage(player.playerSprite.x, player.playerSprite.y, player.playerSprite.width, player.playerSprite.height, player.playerSprite.image);
+      await this._drawImage(player.playerSprite.x - this.screenLeft, player.playerSprite.y - this.screenTop, player.playerSprite.width, player.playerSprite.height, player.playerSprite.image);
     }
   }
 
@@ -156,8 +174,8 @@ class Game extends Component<any, GameState> {
           interactHelper.classList.add('interact-helper');
           interactHelper.innerHTML = `${sprite.name}을 보려면 X키를 누르세요.`;
           interactHelper.id = 'interact-helper-' + spriteIndex;
-          interactHelper.style.left = (sprite.x * 1.5) + 'px';
-          interactHelper.style.top = ((sprite.y + 35) * 1.5) + 'px'
+          interactHelper.style.left = ((sprite.x - this.screenLeft) * 1.5) + 'px';
+          interactHelper.style.top = ((sprite.y + 35 - this.screenTop) * 1.5) + 'px'
           this.gameWrapper?.appendChild(interactHelper);
         }
         interactHelper!.style.marginLeft = `${-((interactHelper!.offsetWidth - (32 * 1.5)) / 2)}px`;
@@ -168,7 +186,7 @@ class Game extends Component<any, GameState> {
         }
       }
 
-      await this._drawImage(sprite.x, sprite.y, sprite.width, sprite.height, sprite.image);
+      await this._drawImage(sprite.x - this.screenLeft, sprite.y - this.screenTop, sprite.width, sprite.height, sprite.image);
       context.restore();
     }
   }
@@ -179,6 +197,38 @@ class Game extends Component<any, GameState> {
     await this._renderSprites();
 
     requestAnimationFrame(() => this._renderGame());
+  }
+
+  private _websiteEnabled = false;
+  private _spriteListener() {
+    document.addEventListener('keydown', (e) => {
+      if ((e.key === 'X' || e.key === 'x' || e.key === 'ㅌ') && !this._websiteEnabled) {
+        let interactTarget: null | Sprite = null;
+        const me = this.state.players[0].playerSprite;
+        for (const sprite of this.state.sprites) {
+          const distance = Math.sqrt(Math.pow(me.x - sprite.x, 2) + Math.pow(me.y - sprite.y, 2));
+          if (distance < 100 && sprite.isInteractable === true) {
+            interactTarget = sprite;
+            break;
+          }
+        }
+
+        if (interactTarget) {
+          this._websiteEnabled = true;
+
+          const websiteWrapper = document.createElement('div');
+          websiteWrapper.classList.add('interact-website');
+          const frame = document.createElement('iframe');
+          websiteWrapper.appendChild(frame);
+          frame.src = 'https://www.youtube.com/embed/j-cObepig6Q?autoplay=1';
+
+          this.gameWrapper?.appendChild(websiteWrapper);
+        }
+      } else if (e.key === 'Escape' && this._websiteEnabled) {
+        this._websiteEnabled = false;
+        this.gameWrapper?.querySelector('.interact-website')?.remove();
+      }
+    });
   }
 
   private _loadGame() {
@@ -196,6 +246,7 @@ class Game extends Component<any, GameState> {
     this.state.players[0].isMe = true;
     this.server = new Server(this);
     this._renderGame().then();
+    this._spriteListener();
   }
 
   render() {

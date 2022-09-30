@@ -21,7 +21,8 @@ class Player {
       y: playerSprite.y,
     };
 
-    setInterval(() => this.animationPlayer(), 350 / 32);
+    setInterval(() => this.animationPlayer(), 150 / 32);
+    setInterval(() => this._refreshNameTag());
   }
 
   set playerId(playerId: string) {
@@ -37,13 +38,12 @@ class Player {
   }
 
   private _refreshNameTag() {
-    this._nameTag.style.left = `${this.playerSprite.x * 1.5}px`;
-    this._nameTag.style.top = `${(this.playerSprite.y - 18) * 1.5}px`;
+    this._nameTag.style.left = `${(this.playerSprite.x - this.game.screenLeft) * 1.5}px`;
+    this._nameTag.style.top = `${(this.playerSprite.y - 18 - this.game.screenTop) * 1.5}px`;
     this._nameTag.style.marginLeft = `${-(this._nameTag.offsetWidth / 2) + (16 * 1.5)}px`;
   }
 
   public animationPlayer() {
-    this._refreshNameTag();
     if (this.playerStatus === 'walking') {
       this._animationStatus += 1;
       this._animationStatus %= 40;
