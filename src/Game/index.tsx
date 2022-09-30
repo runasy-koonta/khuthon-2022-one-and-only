@@ -12,8 +12,11 @@ interface GameState {
   background: BackgroundSprite[];
   players: Player[];
 }
+interface GameProps {
+  nickname: string;
+}
 
-class Game extends Component<any, GameState> {
+class Game extends Component<GameProps, GameState> {
   state: GameState = {
     sprites: [
       {
@@ -244,7 +247,7 @@ class Game extends Component<any, GameState> {
       this.gameCanvas.height = window.innerHeight / 1.5;
     }
     this.state.players[0].isMe = true;
-    this.server = new Server(this);
+    this.server = new Server(this.props.nickname, this);
     this._renderGame().then();
     this._spriteListener();
   }

@@ -9,6 +9,7 @@ interface PlayerMoveData {
 }
 interface NewPlayerData {
   playerId: string;
+  nickname: string;
   x: number;
   y: number;
 }
@@ -19,11 +20,14 @@ interface PlayerVoice {
 
 class Server {
   private _socket;
-  constructor(private _game: Game) {
+  constructor(nickname: string, private _game: Game) {
     this._socket = io('localhost:3001');
 
     this._socket.on('connect', () => {
       this._game.state.players[0].playerId = this._socket.id;
+      this._game.state.players[0].playerSprite.name = nickname;
+
+      this._socket.emit('login', nickname);
     });
 
     this._socket.on('playerMove', (data: PlayerMoveData) => {
@@ -112,6 +116,7 @@ class Server {
 
     // Create new player
     const newPlayer = new Player({
+      name: data.nickname,
       x: data.x,
       y: data.y,
       width: 32,
@@ -130,8 +135,8 @@ class Server {
 
   private _onPlayerDisconnect(playerId: string) {
     const playerIndex = this._game.state.players.findIndex(player => player.playerId === playerId);
+    this._game.state.players[playerIndex].removeNameTag();
     this._game.state.players.splice(playerIndex, 1);
-    console.log(playerId, playerIndex, this._game.state.players);
   }
 
   private _onPlayerMove(data: PlayerMoveData) {

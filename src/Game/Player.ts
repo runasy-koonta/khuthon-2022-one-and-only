@@ -23,15 +23,20 @@ class Player {
 
     setInterval(() => this.animationPlayer(), 150 / 32);
     setInterval(() => this._refreshNameTag());
+
+    setTimeout(() => {
+      this._nameTag.classList.add('name-tag');
+      this.game.gameWrapper?.appendChild(this._nameTag);
+      this._nameTag.innerText = this.playerSprite.name!;
+    }, 500);
+  }
+
+  public removeNameTag() {
+    this._nameTag.remove();
   }
 
   set playerId(playerId: string) {
     this._playerId = playerId;
-
-    this._nameTag.classList.add('name-tag');
-    this.game.gameWrapper?.appendChild(this._nameTag);
-    this._nameTag.innerText = playerId;
-    this._refreshNameTag();
   }
   get playerId() {
     return this._playerId;
@@ -46,21 +51,21 @@ class Player {
   public animationPlayer() {
     if (this.playerStatus === 'walking') {
       this._animationStatus += 1;
-      this._animationStatus %= 40;
+      this._animationStatus %= 80;
 
       if (this.location.x < this.playerSprite.x) {
         this.playerSprite.x -= 1;
         // 좌측 보고 있는 sprite
         if (typeof this.playerSprite.image !== 'string') {
           this.playerSprite.image.x = 96;
-          this.playerSprite.image.y = (Math.floor(this._animationStatus / 10) * 32);
+          this.playerSprite.image.y = (Math.floor(this._animationStatus / 20) * 32);
         }
       } else if (this.location.x > this.playerSprite.x) {
         this.playerSprite.x += 1;
         // 우측 보고 있는 sprite
         if (typeof this.playerSprite.image !== 'string') {
           this.playerSprite.image.x = 64;
-          this.playerSprite.image.y = (Math.floor(this._animationStatus / 10) * 32);
+          this.playerSprite.image.y = (Math.floor(this._animationStatus / 20) * 32);
         }
       }
 
@@ -69,14 +74,14 @@ class Player {
         // 뒤 돌아본 sprite
         if (typeof this.playerSprite.image !== 'string') {
           this.playerSprite.image.x = 32;
-          this.playerSprite.image.y = (Math.floor(this._animationStatus / 10) * 32);
+          this.playerSprite.image.y = (Math.floor(this._animationStatus / 20) * 32);
         }
       } else if (this.location.y > this.playerSprite.y) {
         this.playerSprite.y += 1;
         // 앞 보고 있는 sprite
         if (typeof this.playerSprite.image !== 'string') {
           this.playerSprite.image.x = 0;
-          this.playerSprite.image.y = (Math.floor(this._animationStatus / 10) * 32);
+          this.playerSprite.image.y = (Math.floor(this._animationStatus / 20) * 32);
         }
       }
 
