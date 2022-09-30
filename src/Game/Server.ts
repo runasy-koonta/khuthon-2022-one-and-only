@@ -1,6 +1,8 @@
 import { io } from 'socket.io-client';
 import Game from "./index";
 import Player from "./Player";
+import {PostData} from "../types/Board"
+import Post from './Post';
 
 interface PlayerMoveData {
   playerId: string;
@@ -39,6 +41,11 @@ class Server {
     this._socket.on('playerDisconnect', (playerId: string) => {
       this._onPlayerDisconnect(playerId);
     });
+    
+    this._socket.on('updateBoard', (data: PostData[]) => {
+      this._onUpdateBoard(data);
+    });
+
     this._socket.on('voice', (data: PlayerVoice) => {
       this._onPlayerVoice(data);
     });
@@ -146,6 +153,16 @@ class Server {
 
     const player = this._game.state.players.find(player => player.playerId === data.playerId);
     player?.movePlayer(data.x, data.y);
+  }
+
+  private _onUpdateBoard(data: PostData[]) {
+    let posts: Post[] = [];
+    for (const post of data) {
+      posts.push(new Post(post))
+    }
+
+    this._game.state.posts = posts;
+    console.log(this._game.state.posts)
   }
 }
 
