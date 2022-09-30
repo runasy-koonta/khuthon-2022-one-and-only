@@ -6,11 +6,13 @@ import {BackgroundSprite, ImageSet, Sprite} from "../types/Game";
 import DemoMap from '../map.json';
 import Player from "./Player";
 import Server from "./Server";
+import Post from "./Post"
 
 interface GameState {
   sprites: Sprite[];
   background: BackgroundSprite[];
   players: Player[];
+  posts: Post[];
 }
 
 class Game extends Component<any, GameState> {
@@ -47,6 +49,7 @@ class Game extends Component<any, GameState> {
         }
       }, this),
     ],
+    posts: []
   };
 
   public server: Server | undefined;
